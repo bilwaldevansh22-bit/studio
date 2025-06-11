@@ -1,9 +1,10 @@
+
 "use client";
 import Link from 'next/link';
 import Logo from '@/components/common/Logo';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Home, PlusCircle, UserCircle2 } from 'lucide-react';
+import { Menu, X, Home, PlusCircle, UserCircle2, Settings } from 'lucide-react'; // Added Settings
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import React from 'react';
 
@@ -20,6 +21,7 @@ const Header = () => {
     { href: "/", label: "Home", icon: <Home className="mr-2 h-4 w-4" /> },
     { href: "/create-token", label: "Create Token", icon: <PlusCircle className="mr-2 h-4 w-4" /> },
     { href: "/profile", label: "Profile", icon: <UserCircle2 className="mr-2 h-4 w-4" /> },
+    { href: "/settings", label: "Settings", icon: <Settings className="mr-2 h-4 w-4" /> }, // Added Settings link
   ];
   
   return (

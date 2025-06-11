@@ -1,3 +1,4 @@
+
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -122,4 +123,10 @@ export default function ProfilePage() {
 
       <div className="flex justify-end">
         <Button variant="destructive" onClick={handleLogout}>
-          <Log
+          <LogOut className="mr-2 h-4 w-4" />
+          Log Out
+        </Button>
+      </div>
+    </div>
+  );
+}

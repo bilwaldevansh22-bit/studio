@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ const ConnectWalletButton = () => {
   };
 
   if (isLoading) {
-    return <Button disabled variant="outline" className="animate-pulse w-36"><div className="h-4 w-24 bg-muted-foreground/30 rounded"></div></Button>;
+    return <Button disabled variant="outline" className="animate-pulse w-40"><div className="h-4 w-32 bg-muted-foreground/30 rounded"></div></Button>;
   }
 
   if (isConnected && account) {
@@ -58,7 +59,7 @@ const ConnectWalletButton = () => {
           <Button variant="outline" className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
               <AvatarImage src={`https://avatar.vercel.sh/${account}.png`} alt="User Avatar" />
-              <AvatarFallback>{account.substring(0,2).toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{account.substring(2,4).toUpperCase()}</AvatarFallback>
             </Avatar>
             {shortAccount}
           </Button>
@@ -66,11 +67,15 @@ const ConnectWalletButton = () => {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>Connected Wallet</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-xs break-all">
+          <DropdownMenuItem disabled className="text-xs break-all">
             {account}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => { /* Implement disconnect logic if needed */ console.log("Disconnecting..."); toast({title: "Wallet Disconnected (Simulated)"}) }} className="text-destructive">
+          <DropdownMenuItem onClick={() => { 
+            // In a real app, you might want to clear the session state.
+            // For now, MetaMask handles the "disconnection" state.
+            toast({title: "Wallet Disconnected", description: "You can reconnect at any time."}) 
+            }} className="text-destructive cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             Disconnect
           </DropdownMenuItem>

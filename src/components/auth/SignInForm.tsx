@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ export default function SignInForm() {
     // Placeholder for actual sign-in logic
     toast({
       title: "Sign In Attempted",
-      description: "This is a demo. Actual sign-in functionality is not implemented.",
+      description: "This is a demo. Actual sign-in functionality would be implemented here.",
     });
   };
 
@@ -84,3 +85,10 @@ export default function SignInForm() {
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="#" className="text-primary hover:underline font-semibold">
+            Sign Up
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+  );
+}

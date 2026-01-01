@@ -27,3 +27,7 @@ export type FilterOptions = {
   priceRange?: [number, number];
   sortBy?: 'price-asc' | 'price-desc' | 'date-desc' | 'date-asc';
 };
+
+export interface OwnedShare extends Property {
+  fractionsOwned: number;
+}

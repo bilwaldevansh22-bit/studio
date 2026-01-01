@@ -7,20 +7,28 @@ import type { Property } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label'; // Completed import
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Coins, Tag, MapPin, ArrowLeft, ShoppingCart, Share2, BarChart2 } from 'lucide-react';
+import { Coins, Tag, MapPin, ArrowLeft, ShoppingCart, Share2, BarChart2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import React, { useState, useEffect } from 'react'; // Added React and useEffect
+import React, { useState, useEffect } from 'react';
+import { useMetaMask } from '@/hooks/use-metamask';
+import { ethers } from 'ethers';
+
+// This is a placeholder for the actual price from an oracle
+const ETH_TO_USD_RATE = 3000; 
 
 export default function TokenDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const { account, isConnected, isInstalled, connectWallet } = useMetaMask();
+
   const [property, setProperty] = useState<Property | null>(null);
   const [fractionsToBuy, setFractionsToBuy] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBuying, setIsBuying] = useState(false);
 
   const id = params.id as string;
 
@@ -31,10 +39,78 @@ export default function TokenDetailsPage() {
       setProperty(foundProperty);
     } else {
       toast({ title: "Error", description: "Property not found.", variant: "destructive" });
-      router.push('/'); // Redirect if property not found
+      router.push('/');
     }
     setIsLoading(false);
   }, [id, router, toast]);
+
+  const handleBuyFractions = async () => {
+    if (!isInstalled) {
+      toast({ title: "MetaMask Not Found", description: "Please install MetaMask to proceed.", variant: "destructive" });
+      return;
+    }
+    if (!isConnected) {
+      await connectWallet();
+      return;
+    }
+    if (!property) return;
+
+    setIsBuying(true);
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum!);
+      const signer = await provider.getSigner();
+      
+      const usdAmount = fractionsToBuy * property.pricePerFraction;
+      const ethAmount = usdAmount / ETH_TO_USD_RATE;
+      const amountToSend = ethers.parseEther(ethAmount.toString());
+
+      // In a real app, this would be the address of your marketplace smart contract
+      const recipientAddress = "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"; // Vitalik Buterin's address for demo
+
+      const tx = await signer.sendTransaction({
+        to: recipientAddress,
+        value: amountToSend,
+      });
+
+      toast({ title: "Transaction Sent", description: `Transaction hash: ${tx.hash}. Waiting for confirmation...` });
+
+      await tx.wait();
+
+      // SIMULATION: Update local storage to reflect newly "owned" shares
+      const existingShares = JSON.parse(localStorage.getItem('ownedShares') || '[]');
+      const existingShareIndex = existingShares.findIndex((s: any) => s.id === property.id);
+
+      if (existingShareIndex > -1) {
+        existingShares[existingShareIndex].fractionsOwned += fractionsToBuy;
+      } else {
+        existingShares.push({ ...property, fractionsOwned: fractionsToBuy });
+      }
+      localStorage.setItem('ownedShares', JSON.stringify(existingShares));
+
+
+      toast({
+        title: "Purchase Successful!",
+        description: `You have successfully purchased ${fractionsToBuy} fraction(s) of ${property.name}.`,
+      });
+      
+      // In a real app, you'd refetch property data here to show updated available fractions.
+      // For this demo, we'll just optimistically update it.
+      setProperty(prev => prev ? { ...prev, availableFractions: prev.availableFractions - fractionsToBuy } : null);
+
+
+    } catch (error: any) {
+      console.error("Transaction failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Transaction Failed",
+        description: error?.reason || error?.message || "An unknown error occurred.",
+      });
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
 
   if (isLoading || !property) {
     return (
@@ -54,14 +130,6 @@ export default function TokenDetailsPage() {
 
   const fractionProgress = ((property.totalFractions - property.availableFractions) / property.totalFractions) * 100;
   const totalPrice = fractionsToBuy * property.pricePerFraction;
-
-  const handleBuyFractions = () => {
-    // Placeholder for actual buy logic with MetaMask
-    toast({
-      title: "Purchase Initiated (Demo)",
-      description: `Attempting to buy ${fractionsToBuy} fraction(s) of ${property.name}. This is a demo.`,
-    });
-  };
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in">
@@ -122,7 +190,7 @@ export default function TokenDetailsPage() {
                     max={property.availableFractions}
                     className="w-24 text-center"
                   />
-                  <span className="text-lg font-semibold">Total: ${totalPrice.toLocaleString()}</span>
+                  <span className="text-lg font-semibold">Total: ${totalPrice.toLocaleString()} (~{(totalPrice / ETH_TO_USD_RATE).toFixed(4)} ETH)</span>
                 </div>
               </div>
             </CardContent>
@@ -132,9 +200,10 @@ export default function TokenDetailsPage() {
                 size="lg" 
                 className="w-full sm:w-auto flex-grow bg-accent hover:bg-accent/90 text-accent-foreground" 
                 onClick={handleBuyFractions}
-                disabled={property.availableFractions === 0}
+                disabled={isBuying || property.availableFractions === 0 || !isConnected}
               >
-                <ShoppingCart className="mr-2 h-5 w-5" /> {property.availableFractions === 0 ? 'Sold Out' : 'Buy Fractions'}
+                <ShoppingCart className="mr-2 h-5 w-5" /> 
+                {isBuying ? 'Processing...' : (property.availableFractions === 0 ? 'Sold Out' : (isConnected ? 'Buy Fractions' : 'Connect Wallet to Buy'))}
               </Button>
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 <Share2 className="mr-2 h-5 w-5" /> Share

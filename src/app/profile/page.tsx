@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useMetaMask } from "@/hooks/use-metamask";
 import { useToast } from "@/hooks/use-toast";
-import { UserCircle2, Mail, Edit, LogOut, ShieldCheck, Bell } from "lucide-react";
+import { UserCircle2, Mail, Edit, LogOut, ShieldCheck, Bell, Briefcase } from "lucide-react";
 import React, { useState } from "react";
+import OwnedShares from "@/components/nft/OwnedShares";
 
 export default function ProfilePage() {
   const { account, isConnected } = useMetaMask();
@@ -49,7 +50,7 @@ export default function ProfilePage() {
               <span className="sr-only">{isEditing ? "Cancel Edit" : "Edit Profile"}</span>
             </Button>
           </div>
-          <CardDescription>View and manage your personal details and preferences.</CardDescription>
+          <CardDescription>View and manage your personal details and wallet.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSaveChanges} className="space-y-6">
@@ -96,6 +97,21 @@ export default function ProfilePage() {
           </form>
         </CardContent>
       </Card>
+      
+      {isConnected && (
+         <Card className="shadow-lg">
+            <CardHeader>
+               <CardTitle className="flex items-center">
+                  <Briefcase className="mr-3 h-6 w-6 text-primary" />
+                  My Portfolio
+               </CardTitle>
+               <CardDescription>View and manage your tokenized property fractions.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               <OwnedShares />
+            </CardContent>
+         </Card>
+      )}
 
       <Card className="shadow-lg">
         <CardHeader>

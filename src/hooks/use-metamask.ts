@@ -1,5 +1,19 @@
+
 "use client";
 import { useState, useEffect, useCallback } from 'react';
+
+// EIP-1193 provider interface
+interface EIP1193Provider {
+  request: (request: { method: string; params?: any[] }) => Promise<any>;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  removeListener: (event: string, listener: (...args: any[]) => void) => void;
+}
+
+declare global {
+  interface Window {
+    ethereum?: EIP1193Provider;
+  }
+}
 
 export interface MetaMaskState {
   isInstalled: boolean;
@@ -25,56 +39,60 @@ export function useMetaMask(): MetaMaskState {
     } else {
       setAccount(null);
       setIsConnected(false);
-      // setError('No accounts found. Please ensure your MetaMask wallet is unlocked and has accounts.');
+      // You can uncomment the line below to provide a message when the wallet is locked or has no accounts.
+      // setError('No accounts found. Please ensure your MetaMask wallet is unlocked.');
     }
   }, []);
 
   useEffect(() => {
-    if (typeof window.ethereum !== 'undefined') {
+    // This effect runs once on mount to check for MetaMask and existing connections.
+    if (window.ethereum) {
       setIsInstalled(true);
-      // Check initial connection status
       window.ethereum.request({ method: 'eth_accounts' })
         .then((accounts: string[]) => {
           handleAccountsChanged(accounts);
-          setIsLoading(false);
         })
         .catch((err: any) => {
-          console.error('Error fetching accounts:', err);
-          setError(err.message || 'Could not fetch accounts.');
+          console.error('Error fetching initial accounts:', err);
+          setError('An error occurred while checking for connected accounts.');
+        })
+        .finally(() => {
           setIsLoading(false);
         });
 
+      // Set up listener for account changes
       window.ethereum.on('accountsChanged', handleAccountsChanged);
     } else {
       setIsInstalled(false);
       setIsLoading(false);
     }
 
+    // Cleanup listener on component unmount
     return () => {
-      if (typeof window.ethereum !== 'undefined') {
+      if (window.ethereum) {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       }
     };
   }, [handleAccountsChanged]);
 
   const connectWallet = async () => {
-    setError(null);
-    setIsLoading(true);
-    if (!isInstalled || typeof window.ethereum === 'undefined') {
-      setError('MetaMask is not installed. Please install it to continue.');
-      // Suggestion: window.open('https://metamask.io/download.html', '_blank');
-      setIsLoading(false);
+    if (!isInstalled) {
+      setError('MetaMask is not installed. Please install the extension to continue.');
       return;
     }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum!.request({ method: 'eth_requestAccounts' });
       handleAccountsChanged(accounts as string[]);
     } catch (err: any) {
       console.error('Error connecting to MetaMask:', err);
-      if (err.code === 4001) { // User rejected request
-        setError('Connection request rejected. Please try again.');
+      if (err.code === 4001) { // EIP-1193 user-rejection error
+        setError('Connection request rejected. Please approve the connection in MetaMask.');
       } else {
-        setError(err.message || 'Failed to connect wallet.');
+        setError(err.message || 'Failed to connect wallet. Please try again.');
       }
       setIsConnected(false);
     } finally {

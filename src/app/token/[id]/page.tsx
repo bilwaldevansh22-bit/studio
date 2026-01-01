@@ -145,7 +145,7 @@ export default function TokenDetailsPage() {
   const totalPrice = fractionsToBuy * property.pricePerFraction;
 
   return (
-    <div className="max-w-5xl mx-auto animate-fade-in">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Button variant="outline" onClick={() => router.back()} className="mb-6">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Listings
       </Button>

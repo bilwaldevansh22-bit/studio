@@ -16,7 +16,7 @@ import {
   KeyRound, 
   History, 
   Contrast, 
-  FontSize, 
+  CaseSensitive as FontSize, 
   EyeOff, 
   ShieldCheck 
 } from "lucide-react";

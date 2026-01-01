@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Coins, MapPin, Tag } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface PropertyCardProps {
   property: Property;
@@ -14,54 +15,50 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const fractionProgress = ( (property.totalFractions - property.availableFractions) / property.totalFractions) * 100;
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col h-full animate-fade-in group">
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col h-full rounded-xl group">
       <CardHeader className="p-0 relative">
-        <Link href={`/token/${property.id}`} className="block">
+        <Link href={`/token/${property.id}`} className="block aspect-[4/3] relative">
           <Image
             src={property.imageUrl}
             alt={property.name}
-            width={600}
-            height={400}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
             data-ai-hint={property.imageHint || "real estate"}
           />
         </Link>
-        <Badge variant="secondary" className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm">
+        <Badge variant="secondary" className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm">
           {property.propertyType}
         </Badge>
       </CardHeader>
-      <CardContent className="p-4 flex-grow">
-        <Link href={`/token/${property.id}`}>
+      <CardContent className="p-4 flex-grow flex flex-col">
+        <Link href={`/token/${property.id}`} className='block'>
             <CardTitle className="text-lg font-headline mb-1 leading-tight group-hover:text-primary transition-colors">{property.name}</CardTitle>
         </Link>
-        <div className="flex items-center text-sm text-muted-foreground mb-2">
-          <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-sm text-muted-foreground mb-3">
+          <MapPin className="h-4 w-4 mr-1.5 flex-shrink-0" />
           <span>{property.location}</span>
         </div>
-        <p className="text-sm text-foreground/80 mb-3 line-clamp-2">{property.description}</p>
+        <p className="text-sm text-foreground/80 mb-4 line-clamp-2 flex-grow">{property.description}</p>
         
-        <div className="text-sm space-y-1">
+        <div className="text-sm space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground flex items-center"><Coins className="h-4 w-4 mr-1.5 text-primary"/>Price/Fraction:</span>
-            <span className="font-semibold text-primary">${property.pricePerFraction}</span>
+            <span className="font-semibold text-primary">${property.pricePerFraction.toLocaleString()}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground flex items-center"><Tag className="h-4 w-4 mr-1.5 text-accent"/>Available:</span>
-            <span className="font-semibold">{property.availableFractions} / {property.totalFractions}</span>
+            <span className="font-semibold">{property.availableFractions.toLocaleString()} / {property.totalFractions.toLocaleString()}</span>
           </div>
         </div>
 
-        <div className="w-full bg-muted rounded-full h-1.5 mt-3 mb-1">
-          <div
-            className="bg-primary h-1.5 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${fractionProgress}%` }}
-          ></div>
+        <div className="mt-3 space-y-1">
+          <Progress value={fractionProgress} className="h-2" />
+          <p className="text-xs text-muted-foreground text-right">{fractionProgress.toFixed(0)}% Sold</p>
         </div>
-        <p className="text-xs text-muted-foreground text-right">{fractionProgress.toFixed(0)}% Sold</p>
 
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button asChild className="w-full">
           <Link href={`/token/${property.id}`}>View Details</Link>
         </Button>
       </CardFooter>

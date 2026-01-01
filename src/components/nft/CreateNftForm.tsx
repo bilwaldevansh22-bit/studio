@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { UploadCloud, Tag, Home, DollarSign, Hash, Edit3, MapPin, CheckCircle } from "lucide-react";
+import { UploadCloud, Tag, Home, DollarSign, Hash, Edit3, MapPin } from "lucide-react";
 import React, { useState } from "react";
 import type { Property } from "@/lib/types";
 import { PROPERTY_TYPES } from "@/lib/constants";
@@ -22,6 +22,7 @@ export default function CreateNftForm() {
   const [pricePerFraction, setPricePerFraction] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,7 +41,6 @@ export default function CreateNftForm() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Placeholder for actual NFT creation logic
     if (!propertyType) {
         toast({
             title: "Validation Error",
@@ -49,29 +49,29 @@ export default function CreateNftForm() {
         });
         return;
     }
-    toast({
-      title: "NFT Creation Initiated (Demo)",
-      description: `Creating NFT for ${propertyName}. This is a demo.`,
-      action: (
-        <Button variant="outline" size="sm" onClick={() => console.log("Undo action (simulated)")}>
-          Ok
-        </Button>
-      ),
-    });
-    // Reset form or redirect after successful submission
-    setPropertyName('');
-    setLocation('');
-    setDescription('');
-    setPropertyType('');
-    setTotalSupply('');
-    setPricePerFraction('');
-    setImagePreview(null);
-    setFileName(null);
-    (event.target as HTMLFormElement).reset();
+    setIsSubmitting(true);
+    // In a real app, this would call a smart contract function
+    setTimeout(() => {
+      toast({
+        title: "NFT Creation Initiated (Demo)",
+        description: `Creating NFT for ${propertyName}. This is a demo.`,
+      });
+      // Reset form
+      setPropertyName('');
+      setLocation('');
+      setDescription('');
+      setPropertyType('');
+      setTotalSupply('');
+      setPricePerFraction('');
+      setImagePreview(null);
+      setFileName(null);
+      (event.target as HTMLFormElement).reset();
+      setIsSubmitting(false);
+    }, 1500);
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl">
+    <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-xl">
       <CardHeader>
         <CardTitle className="text-2xl font-headline flex items-center">
           <Edit3 className="mr-3 h-7 w-7 text-primary" /> Tokenize Your Property
@@ -82,7 +82,7 @@ export default function CreateNftForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="propertyName" className="font-semibold">Property Name</Label>
-            <div className="relative mt-1">
+            <div className="relative mt-1.5">
               <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input id="propertyName" value={propertyName} onChange={(e) => setPropertyName(e.target.value)} placeholder="e.g., Sunny Vale Villa" required className="pl-10" />
             </div>
@@ -90,16 +90,16 @@ export default function CreateNftForm() {
 
           <div>
             <Label htmlFor="location" className="font-semibold">Location</Label>
-            <div className="relative mt-1">
+            <div className="relative mt-1.5">
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g., 123 Main St, Anytown" required className="pl-10" />
+              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g., 123 Main St, Anytown, USA" required className="pl-10" />
             </div>
           </div>
           
           <div>
             <Label htmlFor="propertyType" className="font-semibold">Property Type</Label>
             <Select required value={propertyType} onValueChange={(value) => setPropertyType(value as Property['propertyType'])}>
-              <SelectTrigger id="propertyType" className="mt-1">
+              <SelectTrigger id="propertyType" className="mt-1.5">
                 <SelectValue placeholder="Select property type" />
               </SelectTrigger>
               <SelectContent>
@@ -112,20 +112,20 @@ export default function CreateNftForm() {
 
           <div>
             <Label htmlFor="description" className="font-semibold">Description</Label>
-            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Detailed description of the property..." required className="mt-1 min-h-[100px]" />
+            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A detailed and compelling description of the property..." required className="mt-1.5 min-h-[100px]" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="totalSupply" className="font-semibold">Total Fractions (Supply)</Label>
-              <div className="relative mt-1">
+              <div className="relative mt-1.5">
                 <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input id="totalSupply" type="number" value={totalSupply} onChange={(e) => setTotalSupply(e.target.value)} placeholder="e.g., 1000" required min="1" className="pl-10" />
               </div>
             </div>
             <div>
-              <Label htmlFor="pricePerFraction" className="font-semibold">Price per Fraction ($)</Label>
-              <div className="relative mt-1">
+              <Label htmlFor="pricePerFraction" className="font-semibold">Price per Fraction (USD)</Label>
+              <div className="relative mt-1.5">
                 <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input id="pricePerFraction" type="number" value={pricePerFraction} onChange={(e) => setPricePerFraction(e.target.value)} placeholder="e.g., 150" required min="0.01" step="0.01" className="pl-10" />
               </div>
@@ -134,14 +134,14 @@ export default function CreateNftForm() {
 
           <div>
             <Label htmlFor="propertyImage" className="font-semibold">Property Image</Label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md border-border hover:border-primary transition-colors">
+            <div className="mt-1.5 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md border-border hover:border-primary transition-colors">
               <div className="space-y-1 text-center">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Property preview" className="mx-auto h-32 w-auto rounded-md object-contain" />
                 ) : (
                   <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
                 )}
-                <div className="flex text-sm text-muted-foreground">
+                <div className="flex text-sm text-muted-foreground items-center justify-center">
                   <Label
                     htmlFor="propertyImage"
                     className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-ring"
@@ -156,8 +156,9 @@ export default function CreateNftForm() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-3">
-            <Tag className="mr-2 h-5 w-5" /> Create NFT Token
+          <Button type="submit" disabled={isSubmitting} className="w-full text-lg py-6">
+            <Tag className="mr-2 h-5 w-5" /> 
+            {isSubmitting ? 'Creating Token...' : 'Create NFT Token'}
           </Button>
         </form>
       </CardContent>

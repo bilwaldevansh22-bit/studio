@@ -1,4 +1,3 @@
-
 "use client";
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -10,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Coins, Tag, MapPin, ArrowLeft, ShoppingCart, Share2, BarChart2, AlertCircle } from 'lucide-react';
+import { Coins, Tag, MapPin, ArrowLeft, ShoppingCart, Share2, BarChart2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { useMetaMask } from '@/hooks/use-metamask';
@@ -34,6 +33,7 @@ export default function TokenDetailsPage() {
 
   useEffect(() => {
     setIsLoading(true);
+    // In a real app, you'd fetch this from the blockchain or a backend
     const foundProperty = MOCK_PROPERTIES.find(p => p.id === id);
     if (foundProperty) {
       setProperty(foundProperty);
@@ -88,16 +88,14 @@ export default function TokenDetailsPage() {
       }
       localStorage.setItem('ownedShares', JSON.stringify(existingShares));
 
-
       toast({
         title: "Purchase Successful!",
-        description: `You have successfully purchased ${fractionsToBuy} fraction(s) of ${property.name}.`,
+        description: `You have successfully purchased ${fractionsToBuy} fraction(s) of ${property.name}. View them in your profile.`,
       });
       
       // In a real app, you'd refetch property data here to show updated available fractions.
       // For this demo, we'll just optimistically update it.
       setProperty(prev => prev ? { ...prev, availableFractions: prev.availableFractions - fractionsToBuy } : null);
-
 
     } catch (error: any) {
       console.error("Transaction failed:", error);
@@ -110,19 +108,34 @@ export default function TokenDetailsPage() {
       setIsBuying(false);
     }
   };
+  
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "Link Copied!",
+      description: "Property link has been copied to your clipboard.",
+    });
+  }
+
+  const handleViewAnalytics = () => {
+     toast({
+      title: "Analytics Coming Soon!",
+      description: "Detailed property analytics will be available in a future update.",
+    });
+  }
 
 
   if (isLoading || !property) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <div className="animate-pulse space-y-4 w-full max-w-3xl">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="h-72 bg-muted rounded-lg"></div>
+        <div className="animate-pulse space-y-4 w-full max-w-5xl">
+          <div className="h-8 bg-muted rounded w-1/4 mb-6"></div>
+          <div className="h-96 bg-muted rounded-xl"></div>
           <div className="h-6 bg-muted rounded w-3/4"></div>
           <div className="h-4 bg-muted rounded w-1/2"></div>
           <div className="h-4 bg-muted rounded w-full"></div>
           <div className="h-4 bg-muted rounded w-full"></div>
-          <div className="h-10 bg-muted rounded w-1/3 mt-4"></div>
+          <div className="h-12 bg-muted rounded-lg w-1/3 mt-4"></div>
         </div>
       </div>
     );
@@ -137,15 +150,14 @@ export default function TokenDetailsPage() {
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Listings
       </Button>
 
-      <Card className="overflow-hidden shadow-xl">
+      <Card className="overflow-hidden shadow-xl rounded-xl">
         <div className="grid md:grid-cols-2 gap-0">
-          <div className="relative">
+          <div className="relative h-full min-h-[300px] md:min-h-[500px]">
             <Image
               src={property.imageUrl}
               alt={property.name}
-              width={800}
-              height={600}
-              className="w-full h-full object-cover min-h-[300px] md:min-h-[400px] lg:min-h-[500px]"
+              fill
+              className="object-cover"
               data-ai-hint={property.imageHint || "real estate detail"}
             />
             <Badge variant="secondary" className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm text-sm py-1 px-3">
@@ -165,22 +177,24 @@ export default function TokenDetailsPage() {
             <CardContent className="space-y-6 flex-grow">
               <p className="text-foreground/80 leading-relaxed">{property.description}</p>
               
-              <div className="space-y-3 pt-4 border-t">
-                <div className="flex justify-between items-center">
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex justify-between items-baseline">
                   <Label className="text-base font-semibold flex items-center"><Coins className="mr-2 h-5 w-5 text-primary"/>Price per Fraction:</Label>
                   <span className="text-2xl font-bold text-primary">${property.pricePerFraction.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-baseline">
                   <Label className="font-medium flex items-center"><Tag className="mr-2 h-4 w-4 text-accent"/>Fractions Available:</Label>
                   <span className="font-semibold">{property.availableFractions.toLocaleString()} / {property.totalFractions.toLocaleString()}</span>
                 </div>
-                <Progress value={fractionProgress} className="h-2.5 my-2" aria-label={`${fractionProgress.toFixed(0)}% sold`} />
-                <p className="text-sm text-muted-foreground text-right">{fractionProgress.toFixed(0)}% Sold</p>
+                <div className="space-y-1">
+                  <Progress value={fractionProgress} className="h-2" aria-label={`${fractionProgress.toFixed(0)}% sold`} />
+                  <p className="text-sm text-muted-foreground text-right">{fractionProgress.toFixed(0)}% Sold</p>
+                </div>
               </div>
 
               <div className="space-y-3 pt-4 border-t">
                 <Label htmlFor="fractionsToBuy" className="text-base font-semibold">Number of Fractions to Buy:</Label>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
                   <Input
                     id="fractionsToBuy"
                     type="number"
@@ -189,28 +203,32 @@ export default function TokenDetailsPage() {
                     min="1"
                     max={property.availableFractions}
                     className="w-24 text-center"
+                    disabled={property.availableFractions === 0}
                   />
-                  <span className="text-lg font-semibold">Total: ${totalPrice.toLocaleString()} (~{(totalPrice / ETH_TO_USD_RATE).toFixed(4)} ETH)</span>
+                  <span className="text-lg font-semibold whitespace-nowrap">Total: ${totalPrice.toLocaleString()}</span>
                 </div>
+                 <p className="text-sm text-muted-foreground ml-1">~{(totalPrice / ETH_TO_USD_RATE).toFixed(4)} ETH</p>
               </div>
             </CardContent>
 
-            <CardFooter className="p-6 bg-muted/30 border-t flex-col sm:flex-row gap-3">
+            <CardFooter className="p-4 bg-muted/30 border-t flex-col sm:flex-row gap-3">
               <Button 
                 size="lg" 
-                className="w-full sm:w-auto flex-grow bg-accent hover:bg-accent/90 text-accent-foreground" 
+                className="w-full sm:w-auto flex-grow" 
                 onClick={handleBuyFractions}
-                disabled={isBuying || property.availableFractions === 0 || !isConnected}
+                disabled={isBuying || property.availableFractions === 0}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                 {isBuying ? 'Processing...' : (property.availableFractions === 0 ? 'Sold Out' : (isConnected ? 'Buy Fractions' : 'Connect Wallet to Buy'))}
               </Button>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                <Share2 className="mr-2 h-5 w-5" /> Share
-              </Button>
-               <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                <BarChart2 className="mr-2 h-5 w-5" /> View Analytics
-              </Button>
+              <div className="w-full sm:w-auto flex gap-3">
+                <Button size="lg" variant="outline" className="w-full" onClick={handleShare}>
+                  <Share2 className="mr-2 h-5 w-5" /> Share
+                </Button>
+                 <Button size="lg" variant="outline" className="w-full" onClick={handleViewAnalytics}>
+                  <BarChart2 className="mr-2 h-5 w-5" /> Analytics
+                </Button>
+              </div>
             </CardFooter>
           </div>
         </div>

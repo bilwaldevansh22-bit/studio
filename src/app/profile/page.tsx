@@ -1,4 +1,3 @@
-
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,10 +15,9 @@ export default function ProfilePage() {
   const { account, isConnected } = useMetaMask();
   const { toast } = useToast();
 
-  // Mock user data - replace with actual data fetching
   const [user, setUser] = useState({
-    name: "Satoshi Nakamoto", // Placeholder
-    email: "satoshi@example.com", // Placeholder
+    name: "Satoshi Nakamoto",
+    email: "satoshi@example.com",
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -31,117 +29,127 @@ export default function ProfilePage() {
   
   const handleLogout = () => {
      toast({ title: "Logged Out", description: "You have been successfully logged out (simulated)." });
-     // Add actual logout logic here: clear session, redirect, etc.
+     // In a real app, this would clear session, disconnect wallet, and redirect.
   };
+  
+  const handleManageNotifications = () => {
+     toast({ title: "Manage Notifications", description: "This functionality is a demo." });
+  }
+
+  const handleEnable2FA = () => {
+      toast({ title: "Enable Two-Factor Authentication", description: "This functionality is a demo." });
+  }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
-      <div className="flex items-center space-x-4">
-        <UserCircle2 className="h-10 w-10 text-primary" />
-        <h1 className="text-3xl font-headline font-bold">User Profile</h1>
-      </div>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+        <div className="flex items-center space-x-4">
+          <UserCircle2 className="h-10 w-10 text-primary" />
+          <h1 className="text-3xl font-headline font-bold">User Profile</h1>
+        </div>
 
-      <Card className="shadow-lg">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Account Information</CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setIsEditing(!isEditing)}>
-              <Edit className="h-5 w-5" />
-              <span className="sr-only">{isEditing ? "Cancel Edit" : "Edit Profile"}</span>
-            </Button>
-          </div>
-          <CardDescription>View and manage your personal details and wallet.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSaveChanges} className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={account ? `https://avatar.vercel.sh/${account}.png` : `https://avatar.vercel.sh/${user.email}.png`} alt={user.name} />
-                <AvatarFallback>{user.name.substring(0,2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <Label htmlFor="profileName" className="font-semibold">Full Name</Label>
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Account Information</CardTitle>
+              <Button variant="ghost" size="icon" onClick={() => setIsEditing(!isEditing)}>
+                <Edit className="h-5 w-5" />
+                <span className="sr-only">{isEditing ? "Cancel Edit" : "Edit Profile"}</span>
+              </Button>
+            </div>
+            <CardDescription>View and manage your personal details and wallet.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSaveChanges} className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={account ? `https://avatar.vercel.sh/${account}.png` : `https://avatar.vercel.sh/${user.email}.png`} alt={user.name} />
+                  <AvatarFallback>{user.name.substring(0,2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow">
+                  <Label htmlFor="profileName" className="font-semibold">Full Name</Label>
+                  {isEditing ? (
+                    <Input id="profileName" value={user.name} onChange={(e) => setUser({...user, name: e.target.value})} className="text-lg font-medium mt-1" />
+                  ) : (
+                    <p className="text-lg font-medium pt-1">{user.name}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profileEmail" className="font-semibold">Email Address</Label>
                 {isEditing ? (
-                  <Input id="profileName" value={user.name} onChange={(e) => setUser({...user, name: e.target.value})} className="text-lg font-medium mt-1" />
+                  <div className="relative">
+                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                     <Input id="profileEmail" type="email" value={user.email} onChange={(e) => setUser({...user, email: e.target.value})} className="pl-10"/>
+                  </div>
                 ) : (
-                  <p className="text-lg font-medium">{user.name}</p>
+                   <div className="flex items-center pt-1">
+                      <Mail className="h-5 w-5 text-muted-foreground mr-3" />
+                      <p>{user.email}</p>
+                  </div>
                 )}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="profileEmail" className="font-semibold">Email Address</Label>
-              {isEditing ? (
-                <div className="relative">
-                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                   <Input id="profileEmail" type="email" value={user.email} onChange={(e) => setUser({...user, email: e.target.value})} className="pl-10"/>
-                </div>
-              ) : (
-                 <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-muted-foreground mr-2" />
-                    <p>{user.email}</p>
+              
+              {isConnected && account && (
+                <div className="space-y-2">
+                  <Label className="font-semibold">Connected Wallet</Label>
+                  <p className="text-sm text-muted-foreground break-all bg-muted p-3 rounded-md">{account}</p>
                 </div>
               )}
-            </div>
-            
-            {isConnected && account && (
-              <div className="space-y-2">
-                <Label className="font-semibold">Connected Wallet</Label>
-                <p className="text-sm text-muted-foreground break-all bg-muted p-3 rounded-md">{account}</p>
-              </div>
-            )}
 
-            {isEditing && (
-              <Button type="submit" className="w-full sm:w-auto">Save Changes</Button>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-      
-      {isConnected && (
-         <Card className="shadow-lg">
-            <CardHeader>
-               <CardTitle className="flex items-center">
-                  <Briefcase className="mr-3 h-6 w-6 text-primary" />
-                  My Portfolio
-               </CardTitle>
-               <CardDescription>View and manage your tokenized property fractions.</CardDescription>
-            </CardHeader>
-            <CardContent>
-               <OwnedShares />
-            </CardContent>
-         </Card>
-      )}
+              {isEditing && (
+                <Button type="submit" className="w-full sm:w-auto">Save Changes</Button>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+        
+        {isConnected && (
+           <Card className="shadow-lg rounded-xl">
+              <CardHeader>
+                 <CardTitle className="flex items-center">
+                    <Briefcase className="mr-3 h-6 w-6 text-primary" />
+                    My Portfolio
+                 </CardTitle>
+                 <CardDescription>View and manage your tokenized property fractions.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                 <OwnedShares />
+              </CardContent>
+           </Card>
+        )}
 
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>Security & Preferences</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-           <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-md">
-              <div className="flex items-center">
-                <ShieldCheck className="h-5 w-5 mr-2 text-green-600"/>
-                <span>Two-Factor Authentication</span>
-              </div>
-              <Button variant="outline" size="sm">Enable</Button>
-           </div>
-           <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-md">
-              <div className="flex items-center">
-                <Bell className="h-5 w-5 mr-2 text-primary"/>
-                <span>Notification Settings</span>
-              </div>
-              <Button variant="outline" size="sm">Manage</Button>
-           </div>
-        </CardContent>
-      </Card>
-      
-      <Separator />
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader>
+            <CardTitle>Security & Preferences</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+             <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-md">
+                <div className="flex items-center">
+                  <ShieldCheck className="h-5 w-5 mr-3 text-green-600"/>
+                  <span>Two-Factor Authentication</span>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleEnable2FA}>Enable</Button>
+             </div>
+             <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-md">
+                <div className="flex items-center">
+                  <Bell className="h-5 w-5 mr-3 text-primary"/>
+                  <span>Notification Settings</span>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleManageNotifications}>Manage</Button>
+             </div>
+          </CardContent>
+        </Card>
+        
+        <Separator />
 
-      <div className="flex justify-end">
-        <Button variant="destructive" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Log Out
-        </Button>
+        <div className="flex justify-end">
+          <Button variant="destructive" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Log Out
+          </Button>
+        </div>
       </div>
     </div>
   );

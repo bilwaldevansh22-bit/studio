@@ -1,10 +1,9 @@
-
 import type { Metadata } from 'next';
-import type React from 'react'; // Changed from 'import React, { useEffect }'
+import type React from 'react';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import MainLayout from '@/components/layout/MainLayout';
-import ThemeClientInitializer from '@/components/layout/ThemeClientInitializer'; // New import
+import ThemeClientInitializer from '@/components/layout/ThemeClientInitializer';
 
 export const metadata: Metadata = {
   title: 'TokenEstate - Real Estate Tokenization',
@@ -16,7 +15,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // useEffect for theme initialization has been moved to ThemeClientInitializer
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -26,7 +24,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <ThemeClientInitializer /> {/* Added client component for theme effect */}
+        <ThemeClientInitializer />
         <MainLayout>{children}</MainLayout>
         <Toaster />
       </body>

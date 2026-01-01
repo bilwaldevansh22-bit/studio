@@ -1,12 +1,10 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Chrome, Facebook, Mail, Phone, KeyRound, LogIn } from "lucide-react"; // Assuming Chrome for Google
-import Link from "next/link";
+import { Chrome, Facebook, Mail, Phone, KeyRound, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SignInForm() {
@@ -14,7 +12,6 @@ export default function SignInForm() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Placeholder for actual sign-in logic
     toast({
       title: "Sign In Attempted",
       description: "This is a demo. Actual sign-in functionality would be implemented here.",
@@ -27,9 +24,16 @@ export default function SignInForm() {
       description: `Simulating login with ${provider}. This is a demo.`,
     });
   };
+  
+  const handleLinkClick = (feature: string) => {
+     toast({
+      title: "Coming Soon!",
+      description: `${feature} functionality is not yet implemented in this demo.`,
+    });
+  }
 
   return (
-    <Card className="w-full max-w-md shadow-xl">
+    <Card className="w-full max-w-md shadow-xl rounded-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-headline">Welcome Back!</CardTitle>
         <CardDescription>Sign in to access your TokenEstate account.</CardDescription>
@@ -50,7 +54,7 @@ export default function SignInForm() {
               <Input id="password" type="password" placeholder="••••••••" required className="pl-10" />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button type="submit" className="w-full">
             <LogIn className="mr-2 h-5 w-5" /> Sign In
           </Button>
         </form>
@@ -78,15 +82,13 @@ export default function SignInForm() {
             </Button>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col items-center space-y-2">
-        <Link href="#" className="text-sm text-primary hover:underline">
-          Forgot your password?
-        </Link>
+      <CardFooter className="flex flex-col items-center space-y-2 pt-4">
+        <Button variant="link" size="sm" onClick={() => handleLinkClick('Password reset')}>Forgot your password?</Button>
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="#" className="text-primary hover:underline font-semibold">
+          <Button variant="link" size="sm" className="p-0 h-auto" onClick={() => handleLinkClick('Sign up')}>
             Sign Up
-          </Link>
+          </Button>
         </p>
       </CardFooter>
     </Card>

@@ -31,3 +31,13 @@ export type FilterOptions = {
 export interface OwnedShare extends Property {
   fractionsOwned: number;
 }
+
+export interface Transaction {
+  id: string; // transaction hash or a unique ID
+  propertyId: string;
+  propertyName: string;
+  fractionsBought: number;
+  pricePerFraction: number;
+  totalCost: number;
+  date: string; // ISO string
+}

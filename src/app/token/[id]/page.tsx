@@ -2,7 +2,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { MOCK_PROPERTIES } from '@/lib/constants';
-import type { Property } from '@/lib/types';
+import type { Property, Transaction } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -77,7 +77,7 @@ export default function TokenDetailsPage() {
 
       await tx.wait();
 
-      // SIMULATION: Update local storage to reflect newly "owned" shares
+      // SIMULATION: Update local storage for owned shares
       const existingShares = JSON.parse(localStorage.getItem('ownedShares') || '[]');
       const existingShareIndex = existingShares.findIndex((s: any) => s.id === property.id);
 
@@ -87,6 +87,21 @@ export default function TokenDetailsPage() {
         existingShares.push({ ...property, fractionsOwned: fractionsToBuy });
       }
       localStorage.setItem('ownedShares', JSON.stringify(existingShares));
+      
+      // SIMULATION: Update local storage for purchase history
+      const newTransaction: Transaction = {
+        id: tx.hash,
+        propertyId: property.id,
+        propertyName: property.name,
+        fractionsBought: fractionsToBuy,
+        pricePerFraction: property.pricePerFraction,
+        totalCost: usdAmount,
+        date: new Date().toISOString(),
+      };
+      const existingHistory = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
+      existingHistory.unshift(newTransaction); // Add to the beginning of the list
+      localStorage.setItem('purchaseHistory', JSON.stringify(existingHistory));
+
 
       toast({
         title: "Purchase Successful!",

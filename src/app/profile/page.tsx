@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useMetaMask } from "@/hooks/use-metamask";
 import { useToast } from "@/hooks/use-toast";
-import { UserCircle2, Mail, Edit, LogOut, ShieldCheck, Bell, Briefcase } from "lucide-react";
+import { UserCircle2, Mail, Edit, LogOut, ShieldCheck, Bell, Briefcase, History } from "lucide-react";
 import React, { useState } from "react";
 import OwnedShares from "@/components/nft/OwnedShares";
+import PurchaseHistory from "@/components/nft/PurchaseHistory";
 
 export default function ProfilePage() {
   const { account, isConnected } = useMetaMask();
@@ -116,6 +117,21 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                  <OwnedShares />
+              </CardContent>
+           </Card>
+        )}
+
+        {isConnected && (
+           <Card className="shadow-lg rounded-xl">
+              <CardHeader>
+                 <CardTitle className="flex items-center">
+                    <History className="mr-3 h-6 w-6 text-primary" />
+                    Purchase History
+                 </CardTitle>
+                 <CardDescription>A record of all your fractional share purchases.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                 <PurchaseHistory />
               </CardContent>
            </Card>
         )}

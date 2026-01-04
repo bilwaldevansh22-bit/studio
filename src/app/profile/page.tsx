@@ -1,3 +1,4 @@
+
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,12 @@ import { UserCircle2, Mail, Edit, LogOut, ShieldCheck, Bell, Briefcase, History 
 import React, { useState } from "react";
 import OwnedShares from "@/components/nft/OwnedShares";
 import PurchaseHistory from "@/components/nft/PurchaseHistory";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { account, isConnected } = useMetaMask();
   const { toast } = useToast();
+  const router = useRouter();
 
   const [user, setUser] = useState({
     name: "Satoshi Nakamoto",
@@ -34,11 +37,11 @@ export default function ProfilePage() {
   };
   
   const handleManageNotifications = () => {
-     toast({ title: "Manage Notifications", description: "This functionality is a demo." });
+     router.push('/settings');
   }
 
   const handleEnable2FA = () => {
-      toast({ title: "Enable Two-Factor Authentication", description: "This functionality is a demo." });
+      router.push('/settings');
   }
 
   return (

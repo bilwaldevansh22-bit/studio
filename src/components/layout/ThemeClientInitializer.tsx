@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -22,7 +23,8 @@ export default function ThemeClientInitializer() {
     
     // Font Size
     const fontSize = localStorage.getItem('fontSize') || 'medium';
-    document.documentElement.classList.add(`font-${fontSize}`);
+    document.documentElement.style.fontSize = fontSize === 'small' ? '14px' : fontSize === 'large' ? '18px' : '16px';
+
 
   }, []);
 

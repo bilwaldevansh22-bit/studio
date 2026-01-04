@@ -13,13 +13,13 @@ import {
   Palette, 
   ShieldAlert, 
   Accessibility, 
-  KeyRound, 
   History, 
   Contrast, 
   CaseSensitive as FontSize, 
   EyeOff, 
   ShieldCheck,
-  Server
+  Server,
+  LogOut
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import {
@@ -62,16 +62,9 @@ export default function SettingsPage() {
 
     document.documentElement.classList.toggle('high-contrast', storedContrast);
     document.documentElement.classList.toggle('reduce-motion', storedMotion);
-    document.documentElement.classList.remove('font-small', 'font-medium', 'font-large');
-    document.documentElement.classList.add(`font-${storedFontSize}`);
-  }, []);
+    document.documentElement.style.fontSize = storedFontSize === 'small' ? '14px' : storedFontSize === 'large' ? '18px' : '16px';
 
-  const handleFeatureClick = (featureName: string) => {
-    toast({
-      title: "Demo Action",
-      description: `The "${featureName}" feature is for demonstration purposes.`,
-    });
-  };
+  }, []);
 
   const handleHighContrastToggle = (checked: boolean) => {
     setHighContrast(checked);
@@ -94,8 +87,7 @@ export default function SettingsPage() {
   const handleFontSizeChange = (value: FontSize) => {
     setFontSize(value);
     localStorage.setItem('fontSize', value);
-    document.documentElement.classList.remove('font-small', 'font-medium', 'font-large');
-    document.documentElement.classList.add(`font-${value}`);
+    document.documentElement.style.fontSize = value === 'small' ? '14px' : value === 'large' ? '18px' : '16px';
      toast({
       title: `Font Size set to ${value}`,
     });
@@ -164,7 +156,7 @@ export default function SettingsPage() {
                   <Server className="h-5 w-5 text-muted-foreground"/>
                   <p className="text-sm font-medium">Manage Connected Sessions</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => handleFeatureClick("Manage Sessions")}>Manage</Button>
+                <ManageSessionsDialog />
              </div>
              <div className="flex items-center justify-between p-3 bg-secondary/30 rounded-md">
                 <div className="flex items-center gap-3">
@@ -285,7 +277,7 @@ function TwoFactorAuthDialog({ isEnabled, onToggle }: { isEnabled: boolean, onTo
 // Demo Dialog for Login History
 function LoginHistoryDialog() {
   const mockHistory = [
-    { id: 1, device: 'Chrome on macOS', location: 'New York, USA', time: '2 hours ago' },
+    { id: 1, device: 'Chrome on macOS', location: 'New York, USA', time: '2 hours ago', isCurrent: true },
     { id: 2, device: 'Mobile App on iOS', location: 'London, UK', time: '1 day ago' },
     { id: 3, device: 'Firefox on Windows', location: 'Tokyo, Japan', time: '3 days ago' },
   ]
@@ -304,13 +296,68 @@ function LoginHistoryDialog() {
         <div className="space-y-3 mt-2">
           {mockHistory.map(item => (
             <div key={item.id} className="text-sm p-3 bg-secondary/50 rounded-md">
-              <p className="font-semibold">{item.device}</p>
-              <p className="text-muted-foreground">{item.location} - <span className="italic">{item.time}</span></p>
+              <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">{item.device}</p>
+                    <p className="text-muted-foreground">{item.location} - <span className="italic">{item.time}</span></p>
+                  </div>
+                  {item.isCurrent && <span className="text-xs font-semibold text-green-600">Current</span>}
+              </div>
             </div>
           ))}
         </div>
         <AlertDialogFooter className="mt-4">
           <AlertDialogAction>Close</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+
+function ManageSessionsDialog() {
+  const { toast } = useToast();
+  const handleLogoutSession = (device: string) => {
+    toast({
+      title: "Session Logged Out",
+      description: `Successfully signed out from ${device}. (Demo)`
+    })
+  }
+
+  const mockSessions = [
+    { id: 1, device: 'Chrome on macOS', location: 'New York, USA', time: 'Active now', isCurrent: true },
+    { id: 2, device: 'Mobile App on iOS', location: 'London, UK', time: 'Active 1 day ago' },
+  ]
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" size="sm">Manage</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Manage Connected Sessions</AlertDialogTitle>
+          <AlertDialogDescription>
+            You can log out from sessions you no longer recognize or use.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="space-y-3 mt-2">
+          {mockSessions.map(item => (
+            <div key={item.id} className="text-sm p-3 bg-secondary/50 rounded-md flex justify-between items-center">
+              <div>
+                <p className="font-semibold">{item.device}</p>
+                <p className="text-muted-foreground">{item.location} - <span className="italic">{item.time}</span></p>
+              </div>
+              {!item.isCurrent && (
+                <Button variant="destructive" size="sm" onClick={() => handleLogoutSession(item.device)}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log Out
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+        <AlertDialogFooter className="mt-4">
+          <AlertDialogAction>Done</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

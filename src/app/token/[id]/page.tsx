@@ -1,3 +1,4 @@
+
 "use client";
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -14,9 +15,38 @@ import { useToast } from '@/hooks/use-toast';
 import React, { useState, useEffect } from 'react';
 import { useMetaMask } from '@/hooks/use-metamask';
 import { ethers } from 'ethers';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 // This is a placeholder for the actual price from an oracle
 const ETH_TO_USD_RATE = 3000; 
+
+const chartData = [
+  { month: "January", price: 186 },
+  { month: "February", price: 205 },
+  { month: "March", price: 214 },
+  { month: "April", price: 232 },
+  { month: "May", price: 240 },
+  { month: "June", price: 260 },
+]
+
+const chartConfig = {
+  price: {
+    label: "Price ($)",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig
 
 export default function TokenDetailsPage() {
   const params = useParams();
@@ -132,14 +162,6 @@ export default function TokenDetailsPage() {
     });
   }
 
-  const handleViewAnalytics = () => {
-     toast({
-      title: "Analytics Coming Soon!",
-      description: "Detailed property analytics will be available in a future update.",
-    });
-  }
-
-
   if (isLoading || !property) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -240,9 +262,7 @@ export default function TokenDetailsPage() {
                 <Button size="lg" variant="outline" className="w-full" onClick={handleShare}>
                   <Share2 className="mr-2 h-5 w-5" /> Share
                 </Button>
-                 <Button size="lg" variant="outline" className="w-full" onClick={handleViewAnalytics}>
-                  <BarChart2 className="mr-2 h-5 w-5" /> Analytics
-                </Button>
+                 <AnalyticsDialog />
               </div>
             </CardFooter>
           </div>
@@ -250,4 +270,50 @@ export default function TokenDetailsPage() {
       </Card>
     </div>
   );
+}
+
+
+function AnalyticsDialog() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button size="lg" variant="outline" className="w-full">
+          <BarChart2 className="mr-2 h-5 w-5" /> Analytics
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Property Price Analytics (Demo)</AlertDialogTitle>
+          <AlertDialogDescription>
+            This chart shows the simulated price trend for this property over the last 6 months.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="h-[250px] w-full pt-4">
+            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                <BarChart accessibilityLayer data={chartData}>
+                    <XAxis
+                    dataKey="month"
+                    stroke="hsl(var(--foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    />
+                    <YAxis
+                    stroke="hsl(var(--foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `$${value}`}
+                    />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                    <Bar dataKey="price" fill="hsl(var(--primary))" radius={4} />
+                </BarChart>
+            </ChartContainer>
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogAction>Close</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
 }

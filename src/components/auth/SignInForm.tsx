@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Chrome, Facebook, Mail, Phone, KeyRound, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 export default function SignInForm() {
   const { toast } = useToast();
@@ -14,21 +16,21 @@ export default function SignInForm() {
     event.preventDefault();
     toast({
       title: "Sign In Attempted",
-      description: "This is a demo. Actual sign-in functionality would be implemented here.",
+      description: "This platform uses wallet-based authentication. Please connect your wallet to sign in.",
     });
   };
 
   const handleSocialLogin = (provider: string) => {
     toast({
-      title: `${provider} Login`,
-      description: `Simulating login with ${provider}. This is a demo.`,
+      title: `${provider} Login Not Available`,
+      description: `This DApp uses wallet-based authentication. Connect your wallet to proceed.`,
     });
   };
   
   const handleLinkClick = (feature: string) => {
      toast({
-      title: "Coming Soon!",
-      description: `${feature} functionality is not yet implemented in this demo.`,
+      title: "Feature Not Applicable",
+      description: `${feature} is not available in a wallet-based authentication system.`,
     });
   }
 
@@ -86,8 +88,10 @@ export default function SignInForm() {
         <Button variant="link" size="sm" onClick={() => handleLinkClick('Password reset')}>Forgot your password?</Button>
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Button variant="link" size="sm" className="p-0 h-auto" onClick={() => handleLinkClick('Sign up')}>
-            Sign Up
+          <Button variant="link" asChild size="sm" className="p-0 h-auto">
+            <Link href="/">
+              Sign Up
+            </Link>
           </Button>
         </p>
       </CardFooter>

@@ -5,9 +5,14 @@ const Footer = () => {
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} TokenEstate. All rights reserved.
         </p>
-        <p className="text-xs text-muted-foreground mt-2">
-          Disclaimer: This platform is for demonstration purposes only. All transactions are simulated.
-        </p>
+        <div className="text-xs text-muted-foreground mt-4 space-y-1">
+           <p>
+            Contact us: bilwal.devansh101@gmail.com | +91 99293 58681
+          </p>
+          <p>
+            Disclaimer: This platform is for demonstration purposes only. All transactions are simulated.
+          </p>
+        </div>
       </div>
     </footer>
   );

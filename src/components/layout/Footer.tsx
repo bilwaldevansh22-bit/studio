@@ -10,7 +10,7 @@ const Footer = () => {
             Contact us: bilwal.devansh101@gmail.com | +91 99293 58681
           </p>
           <p>
-            Disclaimer: This platform is for demonstration purposes only. All transactions are simulated.
+            All transactions are simulated.
           </p>
         </div>
       </div>
